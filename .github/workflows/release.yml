@@ -110,7 +110,7 @@ jobs:
   publish:
     needs: [python-package, macos-app, windows-app]
     env:
-      GH_TOKEN: ${{ github.token }}
+      GH_TOKEN: ${{ secrets.SMNEG_RELEASE_TOKEN || github.token }}
       GH_REPO: ${{ github.repository }}
       SOURCE_SHA: ${{ github.sha }}
     if: startsWith(github.ref, 'refs/tags/') || inputs.refresh_existing
@@ -118,6 +118,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          token: ${{ secrets.SMNEG_RELEASE_TOKEN || github.token }}
           fetch-depth: 0
       - uses: actions/download-artifact@v8
         with:
