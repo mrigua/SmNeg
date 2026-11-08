@@ -26,6 +26,15 @@ def self_test() -> int:   # returns 1 on failure; exits the process itself on su
         if not (assets / name).is_file():
             print(f"self-test: missing asset {name}")
             return 1
+    if getattr(sys, "frozen", False):
+        licenses = assets.parent / "licenses"
+        for name in ("LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md"):
+            if not (licenses / name).is_file():
+                print(f"self-test: missing license {name}")
+                return 1
+        if "Copyright 2026 Said Mrigua" not in (licenses / "NOTICE").read_text(encoding="utf-8"):
+            print("self-test: missing creator attribution")
+            return 1
     with tempfile.TemporaryDirectory() as folder:
         sample = Path(folder) / "sample.tif"
         pixels = np.random.default_rng(0).integers(2000, 60000, (64, 96, 3), dtype=np.uint16)
