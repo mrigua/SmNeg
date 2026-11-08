@@ -83,7 +83,7 @@ Start at the [documentation index](docs/README.md):
 
 ## Status and limits
 SMneg 0.1.0 is a first public release (beta). It is used daily on macOS; Windows is expected to work but has not been
-tested on real hardware yet (CI runs the non-GUI tests on both).
+tested on real hardware yet (CI runs automated tests on both).
 
 | | macOS | Windows |
 |---|---|---|
@@ -93,7 +93,7 @@ tested on real hardware yet (CI runs the non-GUI tests on both).
 
 - 45 MP class frames need several GB of RAM (zoom caches the last full-resolution frame).
 - RAW demosaicing speed is bounded by LibRaw; the inversion itself is parallelized.
-- `window.py` is large; splitting it is planned. The interface has no automated GUI tests.
+- `window.py` is large; splitting it is planned. Offscreen Qt tests cover crop, undo/redo, sessions and TIFF export; visual and real-camera checks remain manual.
 - Tested with PySide6 6.8, NumPy 2.2, Pillow 12, rawpy 0.27, OpenCV 5.0 on Python 3.10; the bounds in `pyproject.toml`
   are conservative.
 
@@ -101,8 +101,9 @@ tested on real hardware yet (CI runs the non-GUI tests on both).
 ```bash
 pip install -e ".[tiff,dev]" && QT_QPA_PLATFORM=offscreen pytest -q
 ```
-154 tests. `tests/test_engine_golden.py` guards the inversion math against reference results; the others cover the
+221 tests. `tests/test_engine_golden.py` guards the inversion math against reference results; the others cover the
 color pipeline, crop, flat-field, filename templates, sessions, settings migration, TIFF/XMP and the hot folder.
+`tests/test_gui_workflow.py` exercises real Qt widgets with isolated temporary settings and synthetic scans.
 
 ## Contributing and support
 Bug reports, ideas and pull requests are welcome: [CONTRIBUTING.md](CONTRIBUTING.md) ·
