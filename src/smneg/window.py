@@ -538,7 +538,7 @@ class SMnegWindow(QMainWindow):
             try:
                 self.flat_gain = build_flat_field(decode_negative(str(self.flat_path), False))
             except (ValueError, OSError, RuntimeError, LibRawError, cv2.error) as error:
-                self.statusBar().showMessage(f"Flat field indisponible : {error}", 15000)
+                self.statusBar().showMessage(f"Flat field unavailable: {error}", 15000)
         self.update_flat_button()
 
     def choose_flat_field(self):
@@ -714,7 +714,7 @@ class SMnegWindow(QMainWindow):
         try:
             item, version, full, image, reason = future.result()
         except Exception as exc:
-            self.statusBar().showMessage(f"Zoom indisponible : {exc}", 10000)
+            self.statusBar().showMessage(f"Zoom unavailable: {exc}", 10000)
             return
         if item is not self.zoom_item:
             return
@@ -851,7 +851,7 @@ class SMnegWindow(QMainWindow):
             try:
                 project = read_project(Path(folder))
             except (OSError, ValueError) as error:
-                self.statusBar().showMessage(f"Session indisponible : {error}", 15000)
+                self.statusBar().showMessage(f"Session unavailable: {error}", 15000)
             else:
                 self.activate_project(Path(folder), project)
                 return
@@ -1451,7 +1451,6 @@ class SMnegWindow(QMainWindow):
 
         exported = []
         failed = []
-        preview_exports = 0
         export_settings = {
             "format": "TIFF 16-bit" if file_format == "tiff" else "JPEG 8-bit",
             "jpeg_quality": options.quality.value() if file_format == "jpeg" else None,
@@ -1470,15 +1469,13 @@ class SMnegWindow(QMainWindow):
                               max_edge=export_settings["max_edge"], file_format=file_format)
 
         def collect(job):
-            future, filename, photo, used_preview = job
-            nonlocal preview_exports
+            future, filename, photo = job
             try:
                 width, height = future.result()
             except (OSError, ValueError) as error:
                 failed.append(f"{filename} — {error}")
             else:
                 exported.append({**photo, "width": width, "height": height})
-                preview_exports += int(used_preview)
 
         # pipeline: load the next frame ‖ render the current one ‖ write the previous one (identical output, faster)
         loader = ThreadPoolExecutor(max_workers=1, thread_name_prefix="smneg-export-load")
@@ -1497,9 +1494,11 @@ class SMnegWindow(QMainWindow):
 
                 base_full = next_load.result()
                 next_load = loader.submit(fetch, valid[i + 1]) if i + 1 < len(valid) else None
-                used_preview = base_full is None
-                if used_preview:
-                    base_full = item.base_positive
+                if base_full is None:
+                    # never write a preview-resolution image in place of the full-resolution one
+                    failed.append(f"{names[i]} — {Path(item.path).name} could not be decoded at full "
+                                  f"resolution ({self.load_error(item.path)}); not exported")
+                    continue
 
                 rendered = self.render_frame(item, base_full, output_16bit=file_format == "tiff")
                 base_full = None
@@ -1516,12 +1515,12 @@ class SMnegWindow(QMainWindow):
                     "source": source.name,
                     "processed_date": item.processed_date,
                     "source_modified_at": source_modified_at,
-                    "resolution": "preview" if used_preview else "full",
+                    "resolution": "full",
                 }
                 embedded = {**asdict(metadata), **export_settings, **photo} if embed else None
                 if previous_job is not None:
                     collect(previous_job)
-                previous_job = (writer.submit(write, dest / filename, rendered, embedded), filename, photo, used_preview)
+                previous_job = (writer.submit(write, dest / filename, rendered, embedded), filename, photo)
                 rendered = None
             if previous_job is not None:
                 collect(previous_job)
@@ -1545,11 +1544,9 @@ class SMnegWindow(QMainWindow):
             summary += "\nExport interrupted."
         if file_format == "tiff" and options.embed.isChecked() and not TIFF_METADATA_AVAILABLE:
             summary += "\nMetadata not embedded in the TIFF: install the module with  pip install tifffile"
-        if preview_exports:
-            summary += f"\n{preview_exports} exported at preview resolution."
         summary += f"\nDuration: {format_duration(time.monotonic() - started)}"
         if failed:
-            summary += "\nSave failed:\n" + "\n".join(failed)
+            summary += "\nNot exported:\n" + "\n".join(failed)
         box = QMessageBox(self)
         box.setWindowTitle("Export finished")
         box.setIcon(QMessageBox.Icon.Warning if failed else QMessageBox.Icon.Information)

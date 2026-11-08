@@ -7,7 +7,7 @@ git clone https://github.com/saidmrigua/SmNeg.git && cd SmNeg
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -e ".[tiff,dev]"
 QT_QPA_PLATFORM=offscreen pytest -q                    # Windows PowerShell: $env:QT_QPA_PLATFORM="offscreen"
-python -m pyflakes src tests
+python -m pyflakes src tests packaging
 ```
 
 ## Layout
@@ -28,15 +28,20 @@ golden file deliberately. Refactors must be bit-identical.
 ## Tests
 | File | Covers |
 |---|---|
-| `test_engine_golden.py` | inversion against reference outputs, both the sequential and the parallel code path |
+| `test_engine_golden.py` | inversion against reference outputs (both code paths), exact parallel == sequential, unreadable files |
 | `test_pipeline.py` | color pipeline (CMY, density, contrast, saturation, geometry) |
 | `test_crop_flat.py` | crop and flat-field gain |
 | `test_names.py` | filename templates and sequence numbers |
 | `test_session.py`, `test_settings.py` | session files, settings migration (hermetic, unique organization names) |
-| `test_tiff.py` | 16-bit TIFF and XMP |
+| `test_tiff.py` | 16-bit TIFF export and XMP |
+| `test_input_formats.py` | 16-bit TIFF input precision, preview size, EXIF orientation |
+| `test_session_validation.py` | rejects valid JSON with a wrong structure |
+| `test_versions.py` | version numbers agree across files |
 | `test_hot_folder.py` | hot folder watching |
 
-The interface itself (`window.py`, `views.py`, dialogs) has no automated GUI tests; check it by hand with a real RAW
+The interface itself (`window.py`, `views.py`, dialogs, the export loop) has no automated GUI tests; the release workflow
+only starts each built app offscreen as a smoke test.
+Check it by hand with a real RAW
 folder before a release: grid, enlarged view, zoom, crop, undo, PASS, export JPEG and TIFF, session information.
 
 ## Code style

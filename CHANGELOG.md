@@ -4,6 +4,21 @@ All notable changes are listed here. Format based on [Keep a Changelog](https://
 versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- 16-bit TIFF input is decoded without being reduced to 8 bits first (the inversion formulas are unchanged;
+  8-bit TIFF, JPEG, PNG and RAW inputs give the same results as before).
+- Export no longer writes a preview-resolution image when the full-resolution decode fails: that frame is listed as
+  *not exported* and nothing is written for it.
+- Session files are validated (structure and types) before use; a file with valid JSON but the wrong structure now gives a
+  clear error instead of failing later.
+- Three remaining French status messages are now English.
+
+### Added
+- Release workflow: tests must pass on macOS and Windows before anything is built; each app runs a start-up
+  self-test; the macOS app is labelled arm64 (`SMneg-macOS-arm64.dmg`) and the Windows app `SMneg-Windows-x64.zip`.
+- CI installs the wheel and the sdist into a clean environment; `tests/test_versions.py` keeps version numbers in sync.
+- Tests for 16-bit TIFF precision and orientation, session validation, exact parallel/sequential equality and unreadable files.
+
 ### Planned
 - Split `window.py` into smaller modules (needs GUI testing).
 - Code signing / notarization of the macOS app and signing of the Windows app.

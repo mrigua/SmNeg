@@ -20,7 +20,7 @@ flowchart LR
 ## 1. Decoding
 RAW files (`.raf .nef .nrw .dng`) are decoded with LibRaw (through `rawpy`) as **linear 16-bit data with no
 white balance, no auto brightness and no color conversion**, so the orange mask of a color negative is kept
-and the inversion works on real sensor values. TIFF and JPEG sources are read with Pillow. Previews use a
+and the inversion works on real sensor values. JPEG and PNG sources, and 8-bit TIFF, are read with Pillow; 16-bit TIFF is decoded without reducing it to 8 bits. Previews use a
 half-size decode (at most 1600 px); full resolution is only decoded for export and for 100 % zoom.
 
 ## 2. Flat-field (optional)

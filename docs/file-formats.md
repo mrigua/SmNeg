@@ -7,6 +7,11 @@
 | RAW | `.raf .nef .nrw .dng` | decoded as linear data, no white balance (see [how it works](how-it-works.md)) |
 | Raster | `.tif .tiff .jpg .jpeg .png` | read with Pillow |
 
+**TIFF layouts.** 16-bit RGB (and 16-bit grayscale, treated as gray RGB) TIFFs are read at full 16-bit precision. 8-bit
+TIFFs are read as before. Alpha channels are dropped, only the first page is read, the EXIF orientation is applied.
+Other layouts (for example 32-bit float TIFF, palette images) are converted to 8-bit RGB by Pillow, so prefer 16-bit
+integer TIFF for scans. Previews are reduced to 1600 px; export decodes the full-resolution file.
+
 The bare-light-source reference for flat-field correction must be a RAW file.
 
 ## Export presets
@@ -19,7 +24,8 @@ The bare-light-source reference for flat-field correction must be a RAW file.
 | Light web · 1280 px · JPEG 72 | JPEG | long edge 1280 px |
 | Custom | JPEG or TIFF, your quality and size | your choice |
 
-JPEG uses 4:4:4 chroma at quality 95 and above, 4:2:0 below. Frames marked **PASS** are skipped.
+JPEG uses 4:4:4 chroma at quality 95 and above, 4:2:0 below. Frames marked **PASS** are skipped. If a frame cannot be decoded at full resolution (file moved, damaged), it is **not
+exported** and is listed in the summary at the end; SMneg never writes a low-resolution preview in its place.
 
 Exports go into a new folder named from the session (date, title, client, film) inside the destination you
 choose. If the folder already exists, `(2)`, `(3)`... is appended: nothing is overwritten.
@@ -50,4 +56,5 @@ With *Embed metadata* enabled:
 ## Session files
 Each session folder holds `smneg-session.json`: every frame's settings (color, density, rotation, crop, PASS...), the
 current frame, the flat-field reference and the session information. It is plain JSON written atomically. Files named
-`frontier-session.json` (earlier versions) still open.
+`frontier-session.json` (earlier versions) still open. A session file is checked (structure and types) before it is used;
+if it is invalid you get an error message and the current session stays untouched.

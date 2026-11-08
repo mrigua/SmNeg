@@ -3,7 +3,7 @@
 
 ## The app does not open
 - **macOS says the app "cannot be opened" / "is damaged"**: it is not notarized. See
-  [installation](installation.md#macos-smneg-macosdmg) (*Open Anyway*, or `xattr -dr com.apple.quarantine`).
+  [installation](installation.md#macos-apple-silicon-smneg-macos-arm64dmg) (*Open Anyway*, or `xattr -dr com.apple.quarantine`).
 - **Windows SmartScreen blocks it**: *More info → Run anyway*.
 - **From source: `ModuleNotFoundError`**: activate the virtual environment and run `pip install -e ".[tiff]"`.
 - **From source on Linux or a server**: Qt needs a display. For tests use `QT_QPA_PLATFORM=offscreen`.
@@ -27,6 +27,10 @@
 - **"Choose the destination folder" stays red**: pick a folder you can write to.
 - **TIFF has no XMP metadata**: install `tifffile` (`pip install tifffile`, or `pip install "smneg[tiff]"`).
 - **A frame is missing**: it was marked **PASS** (`P`). Press `P` again to restore it.
+- **"not exported ... could not be decoded at full resolution"**: the source file is missing, moved or damaged. Fix the
+  file and export that frame again; the other frames were exported normally.
+- **"Invalid session file"**: the `smneg-session.json` is damaged or was edited by hand. Restore it from a backup or delete
+  it (your images are not touched; frame settings stored in it are lost).
 - **Names have no city / location**: empty variables are dropped on purpose with their separator.
 
 ## Capture button (Nikon NX Tether)

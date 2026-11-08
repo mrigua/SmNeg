@@ -49,7 +49,7 @@ with FUJIFILM or Nikon (see [NOTICE](NOTICE)).
 | ![Session information dialog](docs/images/ui-session-info.png) | ![Keyboard shortcuts](docs/images/ui-shortcuts.png) |
 
 ## Download
-Pre-built apps (macOS `.dmg`, Windows `.zip`), a wheel and an sdist are attached to every
+Pre-built apps (macOS Apple Silicon `.dmg`, Windows x64 `.zip`), a wheel and an sdist are attached to every
 [GitHub Release](https://github.com/saidmrigua/SmNeg/releases/latest). The apps are not code-signed, so the system asks
 for confirmation the first time (macOS: *Open Anyway* in System Settings → Privacy & Security; Windows: *More info →
 Run anyway*). Step by step: [docs/installation.md](docs/installation.md).
@@ -89,7 +89,7 @@ tested on real hardware yet (CI runs the non-GUI tests on both).
 |---|---|---|
 | Inversion, zoom, export | yes | expected to work |
 | Nikon NX Tether capture button | yes (needs Accessibility permission) | disabled |
-| Pre-built app | `.dmg`, not notarized | `.zip`, not signed |
+| Pre-built app | `.dmg` for Apple Silicon only (Intel: run from source), not notarized | `.zip` (64-bit), not signed |
 
 - 45 MP class frames need several GB of RAM (zoom caches the last full-resolution frame).
 - RAW demosaicing speed is bounded by LibRaw; the inversion itself is parallelized.
@@ -101,7 +101,7 @@ tested on real hardware yet (CI runs the non-GUI tests on both).
 ```bash
 pip install -e ".[tiff,dev]" && QT_QPA_PLATFORM=offscreen pytest -q
 ```
-44 tests. `tests/test_engine_golden.py` guards the inversion math against reference results; the others cover the
+79 tests. `tests/test_engine_golden.py` guards the inversion math against reference results; the others cover the
 color pipeline, crop, flat-field, filename templates, sessions, settings migration, TIFF/XMP and the hot folder.
 
 ## Contributing and support
