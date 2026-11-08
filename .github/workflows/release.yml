@@ -47,7 +47,7 @@ jobs:
       - run: python -m pip install build twine
       - run: python -m build
       - run: twine check dist/*
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: python-package
           path: dist/*
@@ -72,7 +72,7 @@ jobs:
         run: |
           mkdir -p dmg && cp -R dist/SMneg.app dmg/
           hdiutil create -volname SMneg -srcfolder dmg -ov -format UDZO SMneg-macOS-arm64.dmg
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-app
           path: SMneg-macOS-arm64.dmg
@@ -97,7 +97,7 @@ jobs:
       - name: Zip the app
         run: Compress-Archive -Path dist/SMneg -DestinationPath SMneg-Windows-x64.zip
         shell: pwsh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows-app
           path: SMneg-Windows-x64.zip
