@@ -34,9 +34,23 @@ CI (`ci.yml`) additionally installs the built wheel and sdist into a clean virtu
 7. Check that all four files are attached to the Release, then download the `.dmg` / `.zip` and open them on a clean machine
    if you can. They are not signed (see below).
 
-## Fixing a failed release
-Delete the Release and the tag on GitHub (*Releases* and *Tags* pages) and push the tag again. Never reuse a version
-number for different content once people have downloaded it: bump the patch number instead.
+## Refreshing the first release while it is being finalized
+The maintainer explicitly chose to keep version `0.1.0` during initial validation.
+Run the Release workflow on `smneg-release` and enable **Refresh existing first release**.
+The workflow validates and builds that exact commit before publication. It backs up
+all previous release assets as a workflow artifact (90-day retention), preserves
+the old tag as `archive/v0.1.0-<old-object-sha>`, and moves `v0.1.0` using a Git lease.
+This updates the automatic source archives too. It replaces the existing downloads,
+provides the old app filenames as identical compatibility aliases, and publishes
+`BUILD_INFO.txt` and `SHA256SUMS.txt`. All packages retain version `0.1.0`.
+After finalization, normal updates should use a new version. An unchecked manual
+run remains a build rehearsal and does not publish anything.
+
+## Creator and licenses
+SMneg was created and developed by **Said Mrigua**, Copyright 2026 Said Mrigua.
+The project's code stays Apache-2.0. Preserve LICENSE and NOTICE, and retain the
+independent licenses and attribution of third-party libraries. Native bundles
+include these notices in `smneg/licenses`; the frozen self-test checks them.
 
 ## Signing (not done yet)
 - macOS: needs an Apple Developer ID certificate and notarization (`codesign` + `notarytool`); then users no longer see
