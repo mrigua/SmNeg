@@ -35,6 +35,7 @@ golden file deliberately. Refactors must be bit-identical.
 | `test_session.py`, `test_settings.py` | session files, settings migration (hermetic, unique organization names) |
 | `test_tiff.py` | 16-bit TIFF export and XMP |
 | `test_input_formats.py` | 16-bit TIFF input precision, preview size, EXIF orientation |
+| `test_crop_orientation.py` | crop box and straighten angle follow the picture when rotation / mirror change (all 64 combinations) |
 | `test_session_validation.py` | rejects valid JSON with a wrong structure |
 | `test_versions.py` | version numbers agree across files |
 | `test_hot_folder.py` | hot folder watching |

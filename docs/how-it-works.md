@@ -53,6 +53,9 @@ Applied to the inverted base, in this order:
 | Saturation | multiply S in HSV |
 | Mirror, rotation (90° steps), auto-crop (5 % border) | geometric |
 
+Manual crops and the straighten angle belong to the picture, not to the screen: when rotation or mirror changes, the crop box
+is moved with the content (`crop.reorient`), so it keeps framing the same part of the scene.
+
 Then the window adds the tone profile (*Natural*, *Flat*, *S Curve*), sharpness, manual crop and
 straightening. Because the pipeline is pure NumPy on the same base array, changing a key re-renders without
 re-decoding the file.

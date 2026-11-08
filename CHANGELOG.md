@@ -5,6 +5,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+- A manual crop now stays on the same part of the picture when you rotate or mirror the frame (before, the crop box
+  stayed at the same place on screen and framed something else). The straighten angle follows too, also when frames
+  receive rotation / mirror through Copy-Paste or Hold. Crops saved by earlier versions are read as they were.
 - 16-bit TIFF input is decoded without being reduced to 8 bits first (the inversion formulas are unchanged;
   8-bit TIFF, JPEG, PNG and RAW inputs give the same results as before).
 - Export no longer writes a preview-resolution image when the full-resolution decode fails: that frame is listed as

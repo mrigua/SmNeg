@@ -29,7 +29,7 @@ from .camera_reference import camera_differences, read_camera_reference
 from .capture import (
     ACCESSIBILITY_REQUIRED, ACCESSIBILITY_SETTINGS, CAPTURE_SCRIPT, NX_TETHER_PATH, SHOOT_SHORTCUT,
 )
-from .crop import ManualCropDialog, apply_crop, straighten_image
+from .crop import ManualCropDialog, apply_crop, reorient, straighten_image
 from .engine import OfficialFilmEngine, decode_negative, source_max_edge, tone_curve
 from .flat_field import RAW_EXTENSIONS, build_flat_field
 from .export import (
@@ -386,7 +386,7 @@ class SMnegWindow(QMainWindow):
         if item is None:
             self.lbl_info.setText("")
             return
-        crop = "Manual crop" if item.manual_crop else ("Auto-crop" if item.auto_crop else "Sans crop")
+        crop = "Manual crop" if item.manual_crop else ("Auto-crop" if item.auto_crop else "No crop")
         parts = [
             f"#{item.index + 1:02d} {Path(item.path).name}",
             f"Contrast {item.contrast:.2f}", f"Sat {item.saturation:.2f}",
@@ -1257,25 +1257,34 @@ class SMnegWindow(QMainWindow):
             item.saturation = max(0.0, min(2.0, round(item.saturation + delta, 2)))
             self.refresh_current_view()
 
+    @staticmethod
+    def set_orientation(item, rotation, mirror):
+        """Change rotation / mirror and move the manual crop and the straighten angle with the picture content,
+        so the crop keeps framing the same part of the scene."""
+        rotation %= 360
+        item.manual_crop, item.straighten = reorient(
+            item.manual_crop, item.straighten, (item.rotation, item.mirror), (rotation, mirror))
+        item.rotation, item.mirror = rotation, mirror
+
     def rotate_cw(self):
         item = self.current_item()
         if item:
             self.begin_edit()
-            item.rotation = (item.rotation + 90) % 360
+            self.set_orientation(item, item.rotation + 90, item.mirror)
             self.refresh_current_view()
 
     def rotate_ccw(self):
         item = self.current_item()
         if item:
             self.begin_edit()
-            item.rotation = (item.rotation - 90) % 360
+            self.set_orientation(item, item.rotation - 90, item.mirror)
             self.refresh_current_view()
 
     def toggle_mirror(self):
         item = self.current_item()
         if item:
             self.begin_edit()
-            item.mirror = not item.mirror
+            self.set_orientation(item, item.rotation, not item.mirror)
             self.refresh_current_view()
 
     def toggle_auto_crop(self):
@@ -1340,8 +1349,7 @@ class SMnegWindow(QMainWindow):
             f.saturation = self.held_settings["saturation"]
             f.sharpness = self.held_settings["sharpness"]
             f.tone_profile = self.held_settings["tone_profile"]
-            f.rotation = self.held_settings["rotation"]
-            f.mirror = self.held_settings["mirror"]
+            self.set_orientation(f, self.held_settings["rotation"], self.held_settings["mirror"])
             f.auto_crop = self.held_settings["auto_crop"]
         self.refresh_current_view()
 
@@ -1375,8 +1383,7 @@ class SMnegWindow(QMainWindow):
             item.saturation = self.copied_settings["saturation"]
             item.sharpness = self.copied_settings["sharpness"]
             item.tone_profile = self.copied_settings["tone_profile"]
-            item.rotation = self.copied_settings["rotation"]
-            item.mirror = self.copied_settings["mirror"]
+            self.set_orientation(item, self.copied_settings["rotation"], self.copied_settings["mirror"])
             item.auto_crop = self.copied_settings["auto_crop"]
             self.refresh_current_view()
 

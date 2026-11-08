@@ -101,7 +101,7 @@ tested on real hardware yet (CI runs the non-GUI tests on both).
 ```bash
 pip install -e ".[tiff,dev]" && QT_QPA_PLATFORM=offscreen pytest -q
 ```
-79 tests. `tests/test_engine_golden.py` guards the inversion math against reference results; the others cover the
+154 tests. `tests/test_engine_golden.py` guards the inversion math against reference results; the others cover the
 color pipeline, crop, flat-field, filename templates, sessions, settings migration, TIFF/XMP and the hot folder.
 
 ## Contributing and support

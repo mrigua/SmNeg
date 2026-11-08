@@ -29,6 +29,46 @@ def straighten_image(image: np.ndarray, angle: float) -> np.ndarray:
                           flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
 
+def rotate_bounds(bounds: CropBounds, clockwise: bool) -> CropBounds:
+    """The same crop box after the image is turned by 90 degrees (all values are fractions of the image size)."""
+    left, top, right, bottom = bounds
+    if clockwise:
+        return (1 - bottom, left, 1 - top, right)
+    return (top, 1 - right, bottom, 1 - left)
+
+
+def flip_bounds(bounds: CropBounds) -> CropBounds:
+    """The same crop box after the image is mirrored left to right."""
+    left, top, right, bottom = bounds
+    return (1 - right, top, 1 - left, bottom)
+
+
+def to_source_bounds(bounds: CropBounds, rotation: int, mirror: bool) -> CropBounds:
+    """Crop box on the displayed image (mirrored, then rotated clockwise) -> box on the untouched source frame."""
+    for _ in range((rotation % 360) // 90):
+        bounds = rotate_bounds(bounds, clockwise=False)
+    return flip_bounds(bounds) if mirror else tuple(bounds)
+
+
+def from_source_bounds(bounds: CropBounds, rotation: int, mirror: bool) -> CropBounds:
+    """Crop box on the untouched source frame -> box on the displayed image."""
+    if mirror:
+        bounds = flip_bounds(bounds)
+    for _ in range((rotation % 360) // 90):
+        bounds = rotate_bounds(bounds, clockwise=True)
+    return tuple(bounds)
+
+
+def reorient(bounds: CropBounds | None, straighten: float, old: tuple[int, bool], new: tuple[int, bool]):
+    """Keep a manual crop and the straighten angle on the same picture content when rotation or mirror changes.
+    `old` and `new` are (rotation, mirror). Returns (bounds, straighten)."""
+    if bounds is not None:
+        bounds = from_source_bounds(to_source_bounds(bounds, *old), *new)
+    if straighten and old[1] != new[1]:
+        straighten = -straighten          # mirroring reverses the direction of a small rotation
+    return bounds, straighten
+
+
 def apply_crop(image: np.ndarray, bounds: CropBounds | None) -> np.ndarray:
     if bounds is None:
         return image
