@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 import cv2
 import numpy as np
 

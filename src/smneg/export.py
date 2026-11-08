@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 from __future__ import annotations
 
 import json
@@ -334,7 +336,7 @@ class ExportDialog(QDialog):
         self.city = self.line("City")
         self.notes = self.line("Notes")
         self.photographer = self.line("Photographer")
-        self.copyright = self.line("© Nom 2026")
+        self.copyright = self.line("© 2026 Your Name")
         self.destination = self.line("Choose the destination folder…")
 
         root = QVBoxLayout(self)
@@ -360,10 +362,10 @@ class ExportDialog(QDialog):
             ("Title", self.shoot_title), ("Location · City", self.pair(self.location, self.city)),
             ("Notes", self.notes), ("Export date", self.date),
         )))
-        left.addWidget(self.group("Client et film", (
+        left.addWidget(self.group("Client and film", (
             ("First · Last name", self.pair(self.first_name, self.last_name)), ("Film", self.film),
         )))
-        left.addWidget(self.group("Auteur", (
+        left.addWidget(self.group("Author", (
             ("Photographer", self.photographer), ("Copyright", self.copyright),
         )))
         left.addStretch(1)
@@ -422,8 +424,8 @@ class ExportDialog(QDialog):
         reset.clicked.connect(lambda checked=False: self.template.setText(DEFAULT_TEMPLATE))
         chips.addWidget(reset, len(VARIABLE_CHIPS) // 4, len(VARIABLE_CHIPS) % 4)
 
-        files_group = self.group("Fichiers", (
-            ("Profil", self.preset), ("", self.preset_info), ("", self.custom_box),
+        files_group = self.group("Files", (
+            ("Profile", self.preset), ("", self.preset_info), ("", self.custom_box),
             ("Name", self.template), ("{seqn} start", self.sequence_text),
         ))
         files_group.form.addRow("Variables", variables)
@@ -704,7 +706,7 @@ class SessionInfoDialog(QDialog):
         )),
         ("Copyright", (
             ("photographer", "Photographer", "Your name"),
-            ("copyright", "Copyright", "© Nom 2026"),
+            ("copyright", "Copyright", "© 2026 Your Name"),
         )),
     )
     FIELDS = tuple(field for _, group in SECTIONS for field in group)

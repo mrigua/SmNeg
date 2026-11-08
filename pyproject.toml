@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,11 +8,11 @@ version = "0.1.0"
 description = "Film negative inversion for camera scanning (RAW/TIFF to positive), with a Frontier-style color workflow."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Said Mrigua" }]
 keywords = ["film", "negative", "scanning", "inversion", "photography", "raw"]
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
@@ -25,6 +25,10 @@ dependencies = [
     "numpy>=1.24",
     "Pillow>=10.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/saidmrigua/SmNeg"
+Issues = "https://github.com/saidmrigua/SmNeg/issues"
 
 [project.optional-dependencies]
 tiff = ["tifffile>=2023.1"]

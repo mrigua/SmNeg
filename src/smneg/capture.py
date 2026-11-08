@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 """Trigger the configured Shoot shortcut in Nikon NX Tether on macOS."""
 
 NX_TETHER_ID = "jp.co.nikon.NXTether"

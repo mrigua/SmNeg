@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 import json
 
 from smneg.session import LEGACY_PROJECT_FILE, PROJECT_FILE, project_path, read_project, write_project

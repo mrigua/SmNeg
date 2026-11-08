@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 """Launch SMneg from a source checkout:  python smneg.py"""
 import sys
 from pathlib import Path

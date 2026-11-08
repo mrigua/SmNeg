@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 from __future__ import annotations
 
 import copy
@@ -546,7 +548,7 @@ class SMnegWindow(QMainWindow):
         if self.flat_path:
             dialog.setText(f"Active reference: {self.flat_path.name}")
         else:
-            dialog.setText("Choisissez le scan RAW du diffuseur sans film.")
+            dialog.setText("Choose the RAW scan of the light source without film.")
         use_selected = dialog.addButton("Use the selected frame", QMessageBox.ButtonRole.AcceptRole)
         use_selected.setEnabled(item is not None and Path(item.path).suffix.lower() in RAW_EXTENSIONS)
         browse = dialog.addButton("Choose a file…", QMessageBox.ButtonRole.ActionRole)

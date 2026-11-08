@@ -1,7 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 import sys
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QHBoxLayout, QLabel, QVBoxLayout
+
+from . import __version__
 
 # All shortcuts (F1 or ?). If you change a shortcut in keyPressEvent, change it here too
 SHORTCUT_SECTIONS = (
@@ -49,6 +53,9 @@ SHORTCUT_SECTIONS = (
 )
 
 
+ABOUT_TEXT = "SMneg {version} · © 2026 Said Mrigua · Apache License 2.0"
+
+
 def platform_keys(keys):
     """Show Ctrl / Alt / Shift on Windows and Linux; the ⌘ ⌥ ⇧ glyphs stay on macOS."""
     if sys.platform == "darwin":
@@ -84,6 +91,9 @@ class ShortcutsDialog(QDialog):
             label.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
             columns.addWidget(label, 1)
         layout.addLayout(columns)
+        about = QLabel(ABOUT_TEXT.format(version=__version__))
+        about.setStyleSheet("color: #7F8A91; font-size: 11px;")
+        layout.addWidget(about)
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         buttons.rejected.connect(self.reject)
         buttons.clicked.connect(self.reject)

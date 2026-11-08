@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 import pytest
 
 from smneg.export import DEFAULT_TEMPLATE, build_output_names as build, parse_sequence

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 """Application settings, with a one-time import of settings saved by earlier (pre-rename) versions."""
 from PySide6.QtCore import QSettings
 

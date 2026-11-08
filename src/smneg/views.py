@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 from __future__ import annotations
 
 from typing import Optional
@@ -116,8 +118,7 @@ class FrameCard(QFrame):
 
         disp = rendered.copy()
         if item.is_passed:
-            cv2.putText(disp, "PASS", (disp.shape[1]//4, disp.shape[0]//2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.8, (255, 0, 0), 3, cv2.LINE_AA)
+            mark_passed(disp)
 
         h, w, ch = disp.shape
         qimg = QImage(disp.data, w, h, ch * w, QImage.Format.Format_RGB888)
@@ -159,11 +160,17 @@ def clamp_center(canvas_w, canvas_h, disp_w, disp_h, cx, cy):
 
 
 def mark_passed(image: np.ndarray) -> None:
-    """Same PASS mark as the enlarged view, scaled to the image size (for full-resolution zoom)."""
+    """Draw a large PASS mark centred on the image (about 60% of its width), whatever its size."""
     height, width = image.shape[:2]
-    k = max(1.0, max(width, height) / 1600)
-    cv2.putText(image, "PASS", (width // 4, height // 2), cv2.FONT_HERSHEY_SIMPLEX,
-                2.5 * k, (255, 0, 0), max(1, round(4 * k)), cv2.LINE_AA)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    (text_w, text_h), _ = cv2.getTextSize("PASS", font, 1.0, 1)
+    scale = 0.6 * width / text_w
+    if text_h * scale > 0.5 * height:
+        scale = 0.5 * height / text_h
+    thickness = max(2, round(scale * 2.5))
+    (text_w, text_h), baseline = cv2.getTextSize("PASS", font, scale, thickness)
+    origin = ((width - text_w) // 2, (height + text_h) // 2 - baseline - round(0.12 * text_h))
+    cv2.putText(image, "PASS", origin, font, scale, (255, 0, 0), thickness, cv2.LINE_AA)
 
 
 def _bgra_image(bgra: np.ndarray) -> QImage:

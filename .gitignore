@@ -13,3 +13,6 @@ Thumbs.db
 .vscode/
 # local backups made during development
 _backup_*/
+dmg/
+icon.iconset/
+icon.icns

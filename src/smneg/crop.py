@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Said Mrigua
 from __future__ import annotations
 
 import math
@@ -181,15 +183,15 @@ class ManualCropDialog(QDialog):
         self.angle.setValue(angle)
         self.angle.valueChanged.connect(self.preview.set_angle)
         self.preview.set_angle(angle)
-        layout.addWidget(QLabel("Redressement"))
+        layout.addWidget(QLabel("Straighten"))
         layout.addWidget(self.angle)
-        self.line_button = QPushButton("Tracer la ligne A → B")
+        self.line_button = QPushButton("Draw line A → B")
         self.line_button.setCheckable(True)
         self.line_button.toggled.connect(self.preview.set_line_mode)
         layout.addWidget(self.line_button)
         layout.addWidget(QLabel("Draw a frame from outside the current frame. Drag inside it to move it."))
         layout.addWidget(self.preview, alignment=Qt.AlignmentFlag.AlignCenter)
-        redraw = QPushButton("Redessiner le cadre")
+        redraw = QPushButton("Redraw frame")
         redraw.clicked.connect(self.preview.redraw)
         layout.addWidget(redraw)
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
