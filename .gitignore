@@ -16,3 +16,7 @@ _backup_*/
 dmg/
 icon.iconset/
 icon.icns
+
+# Isolated repair snapshots (local only)
+smneg_repair_backup/
+smneg_fixed/
