@@ -4,6 +4,14 @@ All notable changes are listed here. Format based on [Keep a Changelog](https://
 versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Planned
+- Split `window.py` into smaller modules (needs GUI testing).
+- Code signing / notarization of the macOS app and signing of the Windows app.
+- Real-hardware testing on Windows.
+
+## [0.1.0] - 2026-11-08
+Refreshed first release: includes the corrections below, with the original release archived.
+
 ### Fixed
 - A manual crop now stays on the same part of the picture when you rotate or mirror the frame (before, the crop box
   stayed at the same place on screen and framed something else). The straighten angle follows too, also when frames
@@ -17,17 +25,15 @@ versions follow [Semantic Versioning](https://semver.org/).
 - Three remaining French status messages are now English.
 
 ### Added
+- Creator attribution in the app and Windows executable; LICENSE, NOTICE and third-party notices in native bundles.
+- Offscreen Qt workflow tests; 221 tests pass.
+- An explicit first-release refresh mode keeps the tag, source archives and downloadable packages consistent, with a backup of the previous release.
 - Release workflow: tests must pass on macOS and Windows before anything is built; each app runs a start-up
   self-test; the macOS app is labelled arm64 (`SMneg-macOS-arm64.dmg`) and the Windows app `SMneg-Windows-x64.zip`.
 - CI installs the wheel and the sdist into a clean environment; `tests/test_versions.py` keeps version numbers in sync.
 - Tests for 16-bit TIFF precision and orientation, session validation, exact parallel/sequential equality and unreadable files.
 
-### Planned
-- Split `window.py` into smaller modules (needs GUI testing).
-- Code signing / notarization of the macOS app and signing of the Windows app.
-- Real-hardware testing on Windows.
-
-## [0.1.0] - 2026-11-08
+### Initial public release
 First public release. SMneg is the open-source version of an existing in-house film-negative inversion tool
 (previously an unreleased "Frontier SP-500 Master v6" controller).
 
