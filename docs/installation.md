@@ -14,7 +14,7 @@ The apps are **not code-signed or notarized**, so the system asks for confirmati
 | macOS 11+ on Apple Silicon (M1 or newer) | `SMneg-macOS-arm64.dmg` | Intel Macs: [install from source](#from-source) |
 | Windows 10/11, 64-bit | `SMneg-Windows-x64.zip` | the interface has not been checked on real Windows hardware yet |
 
-(The first release, v0.1.0, used the names `SMneg-macOS.dmg` (Apple Silicon) and `SMneg-Windows.zip`.)
+The refreshed `v0.1.0` also provides `SMneg-macOS.dmg` and `SMneg-Windows.zip` as compatibility aliases of the same corrected builds. See `BUILD_INFO.txt` for the source commit and `SHA256SUMS.txt` for file checksums.
 
 ### macOS (Apple Silicon): `SMneg-macOS-arm64.dmg`
 1. Open the `.dmg` and drag **SMneg** to *Applications*.
