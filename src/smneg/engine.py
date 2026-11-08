@@ -11,6 +11,9 @@ import numpy as np
 import rawpy
 from PIL import Image, ImageOps
 
+# Prevent decompression bomb DOS attacks
+Image.MAX_IMAGE_PIXELS = 100_000_000
+
 from .flat_field import RAW_EXTENSIONS, apply_flat_field
 
 
