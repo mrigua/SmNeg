@@ -3,16 +3,20 @@ Copyright 2026 Said Mrigua
 
 This product is licensed under the Apache License, Version 2.0 (see LICENSE).
 
+Photographs in docs/images/ are Copyright 2026 Said Mrigua, all rights reserved.
+They are not covered by the Apache License.
+
 SMneg is an independent project. It is not affiliated with, endorsed by or
 sponsored by FUJIFILM Corporation or Nikon Corporation. "FUJIFILM", "Frontier",
 "Nikon" and "NX Tether" are trademarks of their respective owners and are
 mentioned only to describe compatibility and workflow.
 
-Third-party software used at runtime (installed separately, not bundled):
-  PySide6 / Qt for Python   LGPL-3.0 / GPL / commercial (https://www.qt.io/qt-for-python)
-  rawpy                     MIT (uses LibRaw: LGPL-2.1 or CDDL-1.0)
-  opencv-python             Apache-2.0
-  NumPy                     BSD-3-Clause
-  Pillow                    HPND
-  tifffile (optional)       BSD-3-Clause
-Check each project's license before redistributing a bundled application.
+Third-party software
+--------------------
+SMneg uses PySide6 / Qt for Python (LGPL-3.0), rawpy (MIT) with LibRaw
+(LGPL-2.1 or CDDL-1.0), opencv-python (Apache-2.0), NumPy (BSD-3-Clause),
+Pillow (HPND) and, optionally, tifffile (BSD-3-Clause).
+
+The source distribution and the wheel do not contain these packages; pip
+installs them. The pre-built apps attached to GitHub Releases are built with
+PyInstaller and do contain them. See THIRD_PARTY_LICENSES.md for details.

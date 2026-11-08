@@ -77,6 +77,8 @@ jobs:
             ## SMneg ${{ github.ref_name }}
             Film negative inversion for camera scanning. © 2026 Said Mrigua, Apache-2.0.
 
-            - **macOS**: download `SMneg-macOS.dmg`. The app is not notarized: right-click the app and choose *Open* the first time.
+            - **macOS**: download `SMneg-macOS.dmg`. The app is not notarized: right-click → *Open* (macOS 14 and older) or *System Settings → Privacy & Security → Open Anyway* (macOS 15+).
             - **Windows**: download `SMneg-Windows.zip`, unzip, run `SMneg.exe` (SmartScreen may warn: *More info* then *Run anyway*).
             - **Python**: `pip install smneg-*.whl` (or the `.tar.gz`).
+
+            Details: [installation guide](https://github.com/saidmrigua/SmNeg/blob/${{ github.ref_name }}/docs/installation.md) · [changelog](https://github.com/saidmrigua/SmNeg/blob/${{ github.ref_name }}/CHANGELOG.md) · third-party licenses: `THIRD_PARTY_LICENSES.md`.
