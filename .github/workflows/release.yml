@@ -6,6 +6,11 @@ on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      refresh_existing:
+        description: Refresh existing first release (0.1.0), including its tag and downloads
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -104,20 +109,75 @@ jobs:
 
   publish:
     needs: [python-package, macos-app, windows-app]
-    if: startsWith(github.ref, 'refs/tags/')
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ github.sha }}
+    if: startsWith(github.ref, 'refs/tags/') || inputs.refresh_existing
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
           merge-multiple: true
+      - name: Back up existing first-release downloads
+        if: inputs.refresh_existing
+        run: |
+          test "${GITHUB_REF_NAME}" = "smneg-release"
+          VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          test "$VERSION" = "0.1.0"
+          mkdir previous-release
+          gh release view v0.1.0 --json tagName,targetCommitish,body,assets > previous-release/release.json
+          gh release download v0.1.0 --dir previous-release
+          git rev-parse refs/tags/v0.1.0 > previous-release/original-tag-object.txt
+      - uses: actions/upload-artifact@v7
+        if: inputs.refresh_existing
+        with:
+          name: previous-v0.1.0-release
+          path: previous-release/*
+          retention-days: 90
+      - name: Align release tag and prepare package provenance
+        id: release
+        env:
+          REFRESH: ${{ inputs.refresh_existing }}
+        run: |
+          VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          TAG="v$VERSION"
+          if [ "$REFRESH" = "true" ]; then
+            test "$TAG" = "v0.1.0"
+            OLD=$(cat previous-release/original-tag-object.txt)
+            if [ "$OLD" != "$SOURCE_SHA" ]; then
+              git push origin "$OLD:refs/tags/archive/$TAG-$OLD"
+              git push --force-with-lease="refs/tags/$TAG:$OLD" origin "$SOURCE_SHA:refs/tags/$TAG"
+            fi
+          else
+            test "$TAG" = "$GITHUB_REF_NAME"
+          fi
+          test "$(git ls-remote origin "refs/tags/$TAG" "refs/tags/$TAG^{}" | tail -1 | cut -f1)" = "$SOURCE_SHA"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          cp artifacts/SMneg-macOS-arm64.dmg artifacts/SMneg-macOS.dmg
+          cp artifacts/SMneg-Windows-x64.zip artifacts/SMneg-Windows.zip
+          printf 'SMneg %s\nCreated and developed by Said Mrigua\nCopyright 2026 Said Mrigua\nLicense: Apache-2.0\nSource commit: %s\nBuild run: %s/%s/actions/runs/%s\n' "$VERSION" "$SOURCE_SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > artifacts/BUILD_INFO.txt
+          (cd artifacts && sha256sum *) > /tmp/SHA256SUMS.txt
+          mv /tmp/SHA256SUMS.txt artifacts/SHA256SUMS.txt
       - uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           files: artifacts/*
+          fail_on_unmatched_files: true
+          overwrite_files: true
           generate_release_notes: true
           body: |
-            ## SMneg ${{ github.ref_name }}
-            Film negative inversion for camera scanning. © 2026 Said Mrigua, Apache-2.0.
+            ## SMneg ${{ steps.release.outputs.tag }}
+            Created and developed by **Said Mrigua**. Copyright 2026 Said Mrigua. Apache-2.0.
+            Refreshed first release: crop follows rotation/mirror; TIFF precision, full-resolution export safety and session validation are corrected.
+            Source commit: ${{ github.sha }}. All downloads and automatic source archives refer to this commit.
+            See BUILD_INFO.txt and SHA256SUMS.txt for build provenance and checksums.
+            The legacy app filenames are identical compatibility aliases of the architecture-labelled downloads.
 
             - **macOS (Apple Silicon, M1 or newer)**: download `SMneg-macOS-arm64.dmg`. Intel Macs: install from source (see the installation guide). The app is not notarized: right-click → *Open* (macOS 14 and older) or *System Settings → Privacy & Security → Open Anyway* (macOS 15+).
             - **Windows (64-bit)**: download `SMneg-Windows-x64.zip`, unzip, run `SMneg.exe` (SmartScreen may warn: *More info* then *Run anyway*).
@@ -125,4 +185,19 @@ jobs:
 
             The tests passed on macOS and Windows for this tag, and each app ran an automatic start-up self-test before publishing. The graphical interface has not been checked on real Windows hardware yet.
 
-            Details: [installation guide](https://github.com/saidmrigua/SmNeg/blob/${{ github.ref_name }}/docs/installation.md) · [changelog](https://github.com/saidmrigua/SmNeg/blob/${{ github.ref_name }}/CHANGELOG.md) · third-party licenses: `THIRD_PARTY_LICENSES.md`.
+            Details: [installation guide](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/docs/installation.md) · [changelog](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/CHANGELOG.md) · third-party licenses: `THIRD_PARTY_LICENSES.md`.
+      - name: Verify published asset digests
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          gh api "repos/$GH_REPO/releases/tags/$TAG" > /tmp/release.json
+          python3 - <<'PYVERIFY'
+          import hashlib, json
+          from pathlib import Path
+          release = json.loads(Path('/tmp/release.json').read_text())
+          assets = {item['name']: item for item in release['assets']}
+          for path in Path('artifacts').iterdir():
+              expected = 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+              assert assets[path.name]['digest'] == expected, path.name
+          print('All published files match this build.')
+          PYVERIFY
