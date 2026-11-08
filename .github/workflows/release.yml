@@ -38,7 +38,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
-          VERSION=$(python -c "import smneg; print(smneg.__version__)")
+          # -P: do not put the checkout folder first on sys.path, so the installed package is imported, not smneg.py
+          VERSION=$(python -P -c "import smneg; print(smneg.__version__)")
           test "v$VERSION" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} != version v$VERSION"; exit 1; }
 
   python-package:
@@ -174,19 +175,31 @@ jobs:
           generate_release_notes: true
           body: |
             ## SMneg ${{ steps.release.outputs.tag }}
-            Created and developed by **Said Mrigua**. Copyright 2026 Said Mrigua. Apache-2.0.
-            Refreshed first release: crop follows rotation/mirror; TIFF precision, full-resolution export safety and session validation are corrected.
-            Source commit: ${{ github.sha }}. All downloads and automatic source archives refer to this commit.
-            See BUILD_INFO.txt and SHA256SUMS.txt for build provenance and checksums.
-            The legacy app filenames are identical compatibility aliases of the architecture-labelled downloads.
+            Created and developed by **Said Mrigua** — Copyright 2026 Said Mrigua. Licensed under Apache-2.0.
 
-            - **macOS (Apple Silicon, M1 or newer)**: download `SMneg-macOS-arm64.dmg`. Intel Macs: install from source (see the installation guide). The app is not notarized: right-click → *Open* (macOS 14 and older) or *System Settings → Privacy & Security → Open Anyway* (macOS 15+).
-            - **Windows (64-bit)**: download `SMneg-Windows-x64.zip`, unzip, run `SMneg.exe` (SmartScreen may warn: *More info* then *Run anyway*).
-            - **Python**: `pip install smneg-*.whl` (or the `.tar.gz`).
+            ### Download
+            - **[Download for Mac (Apple Silicon, M1 or newer)](https://github.com/saidmrigua/SmNeg/releases/download/${{ steps.release.outputs.tag }}/SMneg-macOS-arm64.dmg)** — `SMneg-macOS-arm64.dmg`
+            - **[Download for Windows (64-bit)](https://github.com/saidmrigua/SmNeg/releases/download/${{ steps.release.outputs.tag }}/SMneg-Windows-x64.zip)** — `SMneg-Windows-x64.zip`
+            - **[Download for Python (wheel)](https://github.com/saidmrigua/SmNeg/releases/download/${{ steps.release.outputs.tag }}/smneg-0.1.0-py3-none-any.whl)** — or the [source package (sdist)](https://github.com/saidmrigua/SmNeg/releases/download/${{ steps.release.outputs.tag }}/smneg-0.1.0.tar.gz)
 
-            The tests passed on macOS and Windows for this tag, and each app ran an automatic start-up self-test before publishing. The graphical interface has not been checked on real Windows hardware yet.
+            ### Install
+            - **macOS**: open the `.dmg` and drag SMneg to Applications. The app is not notarized: right-click → *Open* (macOS 14 and older) or *System Settings → Privacy & Security → Open Anyway* (macOS 15+). Intel Macs: install from source (see the installation guide).
+            - **Windows**: unzip, then run `SMneg.exe` inside the `SMneg` folder (SmartScreen may warn: *More info* → *Run anyway*).
+            - **Python 3.10+**: `pip install smneg-0.1.0-py3-none-any.whl`, then run `smneg`.
 
-            Details: [installation guide](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/docs/installation.md) · [changelog](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/CHANGELOG.md) · third-party licenses: `THIRD_PARTY_LICENSES.md`.
+            ### Fixed in this release
+            - A manual crop stays on the same part of the picture after rotate / mirror, including through Copy-Paste and Hold.
+            - 16-bit TIFF input keeps its full 16-bit precision (inversion formulas unchanged).
+            - Export never writes a preview-resolution image when the full-resolution decode fails; the frame is listed as not exported.
+            - Session files are validated before use, with a clear error for an invalid structure.
+
+            ### Provenance
+            Source commit: `${{ github.sha }}`. The tag, every download and the automatic *Source code* archives refer to this commit.
+            [BUILD_INFO.txt](https://github.com/saidmrigua/SmNeg/releases/download/${{ steps.release.outputs.tag }}/BUILD_INFO.txt) · [SHA256SUMS.txt](https://github.com/saidmrigua/SmNeg/releases/download/${{ steps.release.outputs.tag }}/SHA256SUMS.txt).
+            `SMneg-macOS.dmg` and `SMneg-Windows.zip` are byte-identical copies of the architecture-labelled apps, kept so older links keep working.
+            The tests passed on macOS and Windows for this commit, and each app ran an automatic start-up self-test before publishing. The graphical interface has not yet been checked on real Windows hardware.
+
+            Details: [installation guide](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/docs/installation.md) · [changelog](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/CHANGELOG.md) · [LICENSE](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/LICENSE) · [NOTICE](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/NOTICE) · [third-party licenses](https://github.com/saidmrigua/SmNeg/blob/${{ steps.release.outputs.tag }}/THIRD_PARTY_LICENSES.md).
       - name: Verify published asset digests
         env:
           TAG: ${{ steps.release.outputs.tag }}
