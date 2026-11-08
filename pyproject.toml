@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smneg"
+version = "0.1.0"
+description = "Film negative inversion for camera scanning (RAW/TIFF to positive), with a Frontier-style color workflow."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Said Mrigua" }]
+keywords = ["film", "negative", "scanning", "inversion", "photography", "raw"]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = [
+    "PySide6>=6.5",
+    "rawpy>=0.18",
+    "opencv-python>=4.8",
+    "numpy>=1.24",
+    "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+tiff = ["tifffile>=2023.1"]
+dev = ["pytest>=7", "pyflakes"]
+
+[project.scripts]
+smneg = "smneg.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.setuptools.package-data]
+smneg = ["assets/*"]
